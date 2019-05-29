@@ -1,0 +1,6 @@
+/projects:
+  $ref: ./projects.yaml
+/repositories:
+  $ref: ./repositories.yaml
+/repositories/{project_name}/{repository_name}/tags:
+  $ref: ./repositories_tags.yaml

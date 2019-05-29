@@ -1,0 +1,12 @@
+ComponentOverviewEntry:
+  $ref: ./ComponentOverviewEntry.yaml
+DetailedTag:
+  $ref: ./DetailedTag.yaml
+Label:
+  $ref: ./Label.yaml
+Project:
+  $ref: ./Project.yaml
+ProjectMetadata:
+  $ref: ./ProjectMetadata.yaml
+Repository:
+  $ref: ./Repository.yaml

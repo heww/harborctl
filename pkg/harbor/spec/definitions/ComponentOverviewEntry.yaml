@@ -1,0 +1,8 @@
+type: object
+properties:
+  severity:
+    type: integer
+    description: '1-None/Negligible, 2-Unknown, 3-Low, 4-Medium, 5-High'
+  count:
+    type: integer
+    description: number of the components with certain severity.

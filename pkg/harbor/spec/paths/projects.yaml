@@ -1,0 +1,54 @@
+get:
+  summary: List projects
+  description: |
+    This endpoint returns all projects created by Harbor, and can be filtered by project name.
+  tags:
+    - project
+  operationId: listProjects
+  parameters:
+    - name: name
+      in: query
+      description: The name of project.
+      required: false
+      type: string
+    - name: public
+      in: query
+      description: The project is public or private.
+      required: false
+      type: boolean
+      format: int32
+    - name: owner
+      in: query
+      description: The name of project owner.
+      required: false
+      type: string
+    - name: page
+      in: query
+      type: integer
+      format: int32
+      required: false
+      description: 'The page number, default is 1.'
+    - name: page_size
+      in: query
+      type: integer
+      format: int32
+      required: false
+      description: 'The size of per page, default is 10, maximum is 100.'
+  responses:
+    '200':
+      description: Return all matched projects.
+      schema:
+        type: array
+        items:
+          $ref: '#/definitions/Project'
+      headers:
+        X-Total-Count:
+          description: The total count of projects
+          type: string # when its type is integer, go-swagger will failed if this header find in headers
+        Link:
+          description: Link refers to the previous page and next page
+          type: string
+    '401':
+      description: User need to log in first.
+    '500':
+      description: Internal errors.

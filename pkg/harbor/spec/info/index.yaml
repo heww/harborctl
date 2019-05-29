@@ -1,0 +1,3 @@
+  title: Harbor API
+  description: These APIs provide services for manipulating Harbor project.
+  version: 1.7.0

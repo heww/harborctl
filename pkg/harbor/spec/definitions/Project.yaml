@@ -1,0 +1,41 @@
+type: object
+properties:
+  project_id:
+    type: integer
+    format: int32
+    description: Project ID
+  owner_id:
+    type: integer
+    format: int32
+    description: The owner ID of the project always means the creator of the project.
+  name:
+    type: string
+    description: The name of the project.
+  creation_time:
+    type: string
+    description: The creation time of the project.
+    format: datetime
+  update_time:
+    type: string
+    description: The update time of the project.
+  deleted:
+    type: boolean
+    description: A deletion mark of the project.
+  owner_name:
+    type: string
+    description: The owner name of the project.
+  togglable:
+    type: boolean
+    description: Correspond to the UI about whether the project's publicity is  updatable (for UI)
+  current_user_role_id:
+    type: integer
+    description: The role ID of the current user who triggered the API (for UI)
+  repo_count:
+    type: integer
+    description: The number of the repositories under this project.
+  chart_count:
+    type: integer
+    description: The total number of charts under this project.
+  metadata:
+    description: The metadata of the project.
+    $ref: '#/definitions/ProjectMetadata'

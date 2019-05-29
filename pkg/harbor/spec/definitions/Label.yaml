@@ -1,0 +1,29 @@
+type: object
+properties:
+  id:
+    type: integer
+    description: The ID of label.
+  name:
+    type: string
+    description: The name of label.
+  description:
+    type: string
+    description: The description of label.
+  color:
+    type: string
+    description: The color of label.
+  scope:
+    type: string
+    description: 'The scope of label, g for global labels and p for project labels.'
+  project_id:
+    type: integer
+    description: The project ID if the label is a project label.
+  creation_time:
+    type: string
+    description: The creation time of label.
+  update_time:
+    type: string
+    description: The update time of label.
+  deleted:
+    type: boolean
+    description: The label is deleted or not.

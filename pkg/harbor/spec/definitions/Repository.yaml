@@ -1,0 +1,36 @@
+type: object
+properties:
+  id:
+    type: integer
+    description: The ID of repository.
+  name:
+    type: string
+    description: The name of repository.
+  project_id:
+    type: integer
+    description: The project ID of repository.
+  description:
+    type: string
+    description: The description of repository.
+  pull_count:
+    type: integer
+    description: The pull count of repository.
+  star_count:
+    type: integer
+    description: The star count of repository.
+  tags_count:
+    type: integer
+    description: The tags count of repository.
+  labels:
+    type: array
+    description: The label list.
+    items:
+      $ref: '#/definitions/Label'
+  creation_time:
+    type: string
+    description: The creation time of repository.
+    format: datetime
+  update_time:
+    type: string
+    description: The update time of repository.
+    format: datetime

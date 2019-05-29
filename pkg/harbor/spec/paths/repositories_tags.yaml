@@ -1,0 +1,32 @@
+get:
+  summary: Get tags of a relevant repository.
+  description: |
+    This endpoint aims to retrieve tags from a relevant repository. If deployed with Notary, the signature property of response represents whether the image is singed or not. If the property is null, the image is unsigned.
+  tags:
+    - repository
+  operationId: listRepositoryTags
+  parameters:
+    - name: project_name
+      in: path
+      type: string
+      required: true
+      description: Relevant project name.
+    - name: repository_name
+      in: path
+      type: string
+      required: true
+      description: Relevant repository name.
+    - name: label_ids
+      in: query
+      type: string
+      required: false
+      description: A list of comma separated label IDs.
+  responses:
+    '200':
+      description: Get tags successfully.
+      schema:
+        type: array
+        items:
+          $ref: '#/definitions/DetailedTag'
+    '500':
+      description: Unexpected internal errors.

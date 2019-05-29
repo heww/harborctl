@@ -1,0 +1,21 @@
+swagger: '2.0'
+info:
+  $ref: ./info/index.yaml
+host: localhost
+basePath: /api
+schemes:
+  - http
+  - https
+produces:
+  - application/json
+consumes:
+  - application/json
+securityDefinitions:
+  basicAuth:
+    type: basic
+security:
+  - basicAuth: []
+paths:
+  $ref: ./paths/index.yaml
+definitions:
+  $ref: ./definitions/index.yaml

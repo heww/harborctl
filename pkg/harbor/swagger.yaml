@@ -1,0 +1,408 @@
+swagger: '2.0'
+info:
+  title: Harbor API
+  description: These APIs provide services for manipulating Harbor project.
+  version: 1.7.0
+host: localhost
+basePath: /api
+schemes:
+  - http
+  - https
+produces:
+  - application/json
+consumes:
+  - application/json
+securityDefinitions:
+  basicAuth:
+    type: basic
+security:
+  - basicAuth: []
+paths:
+  /projects:
+    get:
+      summary: List projects
+      description: >
+        This endpoint returns all projects created by Harbor, and can be
+        filtered by project name.
+      tags:
+        - project
+      operationId: listProjects
+      parameters:
+        - name: name
+          in: query
+          description: The name of project.
+          required: false
+          type: string
+        - name: public
+          in: query
+          description: The project is public or private.
+          required: false
+          type: boolean
+          format: int32
+        - name: owner
+          in: query
+          description: The name of project owner.
+          required: false
+          type: string
+        - name: page
+          in: query
+          type: integer
+          format: int32
+          required: false
+          description: 'The page number, default is 1.'
+        - name: page_size
+          in: query
+          type: integer
+          format: int32
+          required: false
+          description: 'The size of per page, default is 10, maximum is 100.'
+      responses:
+        '200':
+          description: Return all matched projects.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Project'
+          headers:
+            X-Total-Count:
+              description: The total count of projects
+              type: string
+            Link:
+              description: Link refers to the previous page and next page
+              type: string
+        '401':
+          description: User need to log in first.
+        '500':
+          description: Internal errors.
+  /repositories:
+    get:
+      summary: Get repositories accompany with relevant project and repo name.
+      description: >
+        This endpoint lets user search repositories accompanying with relevant
+        project ID and repo name. Repositories can be sorted by repo name,
+        creation_time, update_time in either ascending or descending order.
+      tags:
+        - repository
+      operationId: listRepositories
+      parameters:
+        - name: project_id
+          in: query
+          type: integer
+          format: int32
+          required: true
+          description: Relevant project ID.
+        - name: q
+          in: query
+          type: string
+          required: false
+          description: Repo name for filtering results.
+        - name: sort
+          in: query
+          type: string
+          required: false
+          description: >
+            Sort method, valid values include: 'name', '-name', 'creation_time',
+            '-creation_time', 'update_time', '-update_time'. Here '-' stands for
+            descending order.
+        - name: label_id
+          in: query
+          type: integer
+          required: false
+          description: The ID of label used to filter the result.
+        - name: page
+          in: query
+          type: integer
+          format: int32
+          required: false
+          description: 'The page nubmer, default is 1.'
+        - name: page_size
+          in: query
+          type: integer
+          format: int32
+          required: false
+          description: 'The size of per page, default is 10, maximum is 100.'
+      responses:
+        '200':
+          description: Get repositories successfully.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Repository'
+          headers:
+            X-Total-Count:
+              description: The total count of repositories
+              type: integer
+            Link:
+              description: Link refers to the previous page and next page
+              type: string
+        '400':
+          description: Invalid project ID.
+        '403':
+          description: >-
+            Project is not public or current user is irrelevant to the
+            repository.
+        '404':
+          description: Project ID does not exist.
+        '500':
+          description: Unexpected internal errors.
+  '/repositories/{project_name}/{repository_name}/tags':
+    get:
+      summary: Get tags of a relevant repository.
+      description: >
+        This endpoint aims to retrieve tags from a relevant repository. If
+        deployed with Notary, the signature property of response represents
+        whether the image is singed or not. If the property is null, the image
+        is unsigned.
+      tags:
+        - repository
+      operationId: listRepositoryTags
+      parameters:
+        - name: project_name
+          in: path
+          type: string
+          required: true
+          description: Relevant project name.
+        - name: repository_name
+          in: path
+          type: string
+          required: true
+          description: Relevant repository name.
+        - name: label_ids
+          in: query
+          type: string
+          required: false
+          description: A list of comma separated label IDs.
+      responses:
+        '200':
+          description: Get tags successfully.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/DetailedTag'
+        '500':
+          description: Unexpected internal errors.
+definitions:
+  ComponentOverviewEntry:
+    type: object
+    properties:
+      severity:
+        type: integer
+        description: '1-None/Negligible, 2-Unknown, 3-Low, 4-Medium, 5-High'
+      count:
+        type: integer
+        description: number of the components with certain severity.
+  DetailedTag:
+    type: object
+    properties:
+      digest:
+        type: string
+        description: The digest of the tag.
+      name:
+        type: string
+        description: The name of the tag.
+      size:
+        type: integer
+        description: The size of the image.
+      architecture:
+        type: string
+        description: The architecture of the image.
+      os:
+        type: string
+        description: The os of the image.
+      docker_version:
+        type: string
+        description: The version of docker which builds the image.
+      author:
+        type: string
+        description: The author of the image.
+      created:
+        type: string
+        description: The build time of the image.
+        format: datetime
+      signature:
+        type: object
+        description: >-
+          The signature of image, defined by RepoSignature. If it is null, the
+          image is unsigned.
+      scan_overview:
+        type: object
+        description: The overview of the scan result.  This is an optional property.
+        properties:
+          digest:
+            type: string
+            description: The digest of the image.
+          scan_status:
+            type: string
+            description: >-
+              The status of the scan job, it can be "pendnig", "running",
+              "finished", "error".
+          job_id:
+            type: integer
+            description: The ID of the job on jobservice to scan the image.
+          severity:
+            type: integer
+            description: '0-Not scanned, 1-Negligible, 2-Unknown, 3-Low, 4-Medium, 5-High'
+          details_key:
+            type: string
+            description: >-
+              The top layer name of this image in Clair, this is for calling
+              Clair API to get the vulnerability list of this image.
+          components:
+            type: object
+            description: The components overview of the image.
+            properties:
+              total:
+                type: integer
+                description: Total number of the components in this image.
+              summary:
+                description: List of number of components of different severities.
+                type: array
+                items:
+                  $ref: '#/definitions/ComponentOverviewEntry'
+      labels:
+        type: array
+        description: The label list.
+        items:
+          $ref: '#/definitions/Label'
+  Label:
+    type: object
+    properties:
+      id:
+        type: integer
+        description: The ID of label.
+      name:
+        type: string
+        description: The name of label.
+      description:
+        type: string
+        description: The description of label.
+      color:
+        type: string
+        description: The color of label.
+      scope:
+        type: string
+        description: 'The scope of label, g for global labels and p for project labels.'
+      project_id:
+        type: integer
+        description: The project ID if the label is a project label.
+      creation_time:
+        type: string
+        description: The creation time of label.
+      update_time:
+        type: string
+        description: The update time of label.
+      deleted:
+        type: boolean
+        description: The label is deleted or not.
+  Project:
+    type: object
+    properties:
+      project_id:
+        type: integer
+        format: int32
+        description: Project ID
+      owner_id:
+        type: integer
+        format: int32
+        description: The owner ID of the project always means the creator of the project.
+      name:
+        type: string
+        description: The name of the project.
+      creation_time:
+        type: string
+        description: The creation time of the project.
+        format: datetime
+      update_time:
+        type: string
+        description: The update time of the project.
+      deleted:
+        type: boolean
+        description: A deletion mark of the project.
+      owner_name:
+        type: string
+        description: The owner name of the project.
+      togglable:
+        type: boolean
+        description: >-
+          Correspond to the UI about whether the project's publicity is 
+          updatable (for UI)
+      current_user_role_id:
+        type: integer
+        description: The role ID of the current user who triggered the API (for UI)
+      repo_count:
+        type: integer
+        description: The number of the repositories under this project.
+      chart_count:
+        type: integer
+        description: The total number of charts under this project.
+      metadata:
+        description: The metadata of the project.
+        $ref: '#/definitions/ProjectMetadata'
+  ProjectMetadata:
+    type: object
+    properties:
+      public:
+        type: string
+        description: >-
+          The public status of the project. The valid values are "true",
+          "false".
+      enable_content_trust:
+        type: string
+        description: >-
+          Whether content trust is enabled or not. If it is enabled, user cann't
+          pull unsigned images from this project. The valid values are "true",
+          "false".
+      prevent_vul:
+        type: string
+        description: >-
+          Whether prevent the vulnerable images from running. The valid values
+          are "true", "false".
+      severity:
+        type: string
+        description: >-
+          If the vulnerability is high than severity defined here, the images
+          cann't be pulled. The valid values are "negligible", "low", "medium",
+          "high", "critical".
+      auto_scan:
+        type: string
+        description: >-
+          Whether scan images automatically when pushing. The valid values are
+          "true", "false".
+  Repository:
+    type: object
+    properties:
+      id:
+        type: integer
+        description: The ID of repository.
+      name:
+        type: string
+        description: The name of repository.
+      project_id:
+        type: integer
+        description: The project ID of repository.
+      description:
+        type: string
+        description: The description of repository.
+      pull_count:
+        type: integer
+        description: The pull count of repository.
+      star_count:
+        type: integer
+        description: The star count of repository.
+      tags_count:
+        type: integer
+        description: The tags count of repository.
+      labels:
+        type: array
+        description: The label list.
+        items:
+          $ref: '#/definitions/Label'
+      creation_time:
+        type: string
+        description: The creation time of repository.
+        format: datetime
+      update_time:
+        type: string
+        description: The update time of repository.
+        format: datetime
+

@@ -1,0 +1,64 @@
+get:
+  summary: Get repositories accompany with relevant project and repo name.
+  description: |
+    This endpoint lets user search repositories accompanying with relevant project ID and repo name. Repositories can be sorted by repo name, creation_time, update_time in either ascending or descending order.
+  tags:
+    - repository
+  operationId: listRepositories
+  parameters:
+    - name: project_id
+      in: query
+      type: integer
+      format: int32
+      required: true
+      description: Relevant project ID.
+    - name: q
+      in: query
+      type: string
+      required: false
+      description: Repo name for filtering results.
+    - name: sort
+      in: query
+      type: string
+      required: false
+      description: |
+        Sort method, valid values include: 'name', '-name', 'creation_time', '-creation_time', 'update_time', '-update_time'. Here '-' stands for descending order.
+    - name: label_id
+      in: query
+      type: integer
+      required: false
+      description: The ID of label used to filter the result.
+    - name: page
+      in: query
+      type: integer
+      format: int32
+      required: false
+      description: 'The page nubmer, default is 1.'
+    - name: page_size
+      in: query
+      type: integer
+      format: int32
+      required: false
+      description: 'The size of per page, default is 10, maximum is 100.'
+  responses:
+    '200':
+      description: Get repositories successfully.
+      schema:
+        type: array
+        items:
+          $ref: '#/definitions/Repository'
+      headers:
+        X-Total-Count:
+          description: The total count of repositories
+          type: integer
+        Link:
+          description: Link refers to the previous page and next page
+          type: string
+    '400':
+      description: Invalid project ID.
+    '403':
+      description: Project is not public or current user is irrelevant to the repository.
+    '404':
+      description: Project ID does not exist.
+    '500':
+      description: Unexpected internal errors.
